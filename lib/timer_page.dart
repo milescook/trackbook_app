@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'lap.dart';
+import 'stint.dart';
 
 class ElapsedTime {
   final int hundreds;
@@ -53,7 +54,7 @@ class Dependencies {
   bool safetyCar = false;
   String sessionStateText = "Running";
 
-  List<Lap> laps = <Lap>[];
+  Stint stint = new Stint();
 }
 
 class TimerPage extends StatefulWidget {
@@ -88,7 +89,7 @@ class TimerPageState extends State<TimerPage> {
     thisLap.yellowFlags = dependencies.yellowFlags;
     thisLap.safetyCar = dependencies.safetyCar;
 
-    dependencies.laps.add(thisLap);
+    dependencies.stint.addLap(thisLap);
   }
 
   void toggleYellow(context)
@@ -158,6 +159,30 @@ class TimerPageState extends State<TimerPage> {
     ];
   }
 
+  getHistoricalLapRowWidget(Lap thisLap)
+  {
+    Row thisRow = new Row
+    (
+      children: <Widget>[
+          Text(thisLap.laptimeMilliseconds.toString(),style: TextStyle(fontSize: 60))
+      ],
+    );
+
+    return thisRow;
+  }
+
+  getLapHistory()
+  {
+    var lapWidgets = <Widget> [];
+
+    for (Lap thisLap in dependencies.stint.getLast(3) )
+    {
+      lapWidgets.add(getHistoricalLapRowWidget(thisLap));
+    }
+    return lapWidgets;
+    
+  }
+
   getCurrentLapNumber()
   {
     return new Text(dependencies.lapNumber.toString(),style: TextStyle(fontSize: 60));
@@ -181,18 +206,18 @@ class TimerPageState extends State<TimerPage> {
   getCurrentLapButtons()
   {
     return new Expanded(
-              flex: 0,
-              child: new Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: new Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    buildFloatingButton(dependencies.stopwatch.isRunning ? "lap" : "start", lapButtonPressed),
-                    //buildFloatingButton(dependencies.stopwatch.isRunning ? "stop" : "start", rightButtonPressed),
-                  ],
-                ),
-              ),
-            );
+      flex: 0,
+      child: new Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            buildFloatingButton(dependencies.stopwatch.isRunning ? "lap" : "start", lapButtonPressed),
+            //buildFloatingButton(dependencies.stopwatch.isRunning ? "stop" : "start", rightButtonPressed),
+          ],
+        ),
+      ),
+    );
   }
 
 
@@ -228,22 +253,21 @@ class TimerPageState extends State<TimerPage> {
         margin: EdgeInsets.fromLTRB(0, 40, 0, 30),
         height: 600,
         child: new Column(
-            
-            children: <Widget>[
-              new Row(
-                children:  getCurrentLaptimeRow()
-              ),
-              new Row(
-                children: getCurrentLapOptionsRow()
-              )
-            ],
-          
+          children: <Widget>[
+            new Row(
+              children:  getCurrentLaptimeRow()
+            ),
+            new Row(
+              children: getCurrentLapOptionsRow()
+            ),
+            new Row(
+              children: getLapHistory()
+            )
+          ],
         ),
       ),
     ),
   );
-
-   
   }
 } // Class TimerPage
 
