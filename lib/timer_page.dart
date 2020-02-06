@@ -47,13 +47,11 @@ class Dependencies {
   final TextStyle textStyle = const TextStyle(fontSize: 60.0, fontFamily: "Bebas Neue");
   final Stopwatch stopwatch = new Stopwatch();
   final int timerMillisecondsRefreshRate = 60;
-  IconData safetyCarIcon = Icons.directions_car;
   int lapNumber = 1;
   int pitwallEta = 0;
   Color sessionStateColor = Colors.green;
   YellowFlags yellowFlagObject = new YellowFlags();
   SafetyCar safetyCarObject = new SafetyCar();
-  bool safetyCar = false;
   String sessionStateText = "Running";
 
   Stint stint = new Stint();
@@ -90,9 +88,7 @@ class TimerPageState extends State<TimerPage> {
     thisLap.lapNumber = dependencies.lapNumber;
     thisLap.laptimeMilliseconds = laptime;
     thisLap.yellowFlags = dependencies.yellowFlagObject;
-    thisLap.safetyCar = dependencies.safetyCar;
-
-    int milliseconds = dependencies.stopwatch.elapsedMilliseconds;
+    thisLap.safetyCar = dependencies.safetyCarObject;
     
     dependencies.stint.addLap(thisLap);
   }
