@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'lap.dart';
 import 'stint.dart';
+import 'yellow_flags.dart';
+import 'safety_car.dart';
 
 class ElapsedTime {
   final int hundreds;
@@ -45,13 +47,12 @@ class Dependencies {
   final TextStyle textStyle = const TextStyle(fontSize: 60.0, fontFamily: "Bebas Neue");
   final Stopwatch stopwatch = new Stopwatch();
   final int timerMillisecondsRefreshRate = 60;
-  IconData yellowFlagIcon = Icons.outlined_flag;
   IconData safetyCarIcon = Icons.directions_car;
   int lapNumber = 1;
   int pitwallEta = 0;
   Color sessionStateColor = Colors.green;
-  Color safetyCarColor = Colors.grey;
-  bool yellowFlags = false;
+  YellowFlags yellowFlagObject = new YellowFlags();
+  SafetyCar safetyCarObject = new SafetyCar();
   bool safetyCar = false;
   String sessionStateText = "Running";
 
@@ -88,7 +89,7 @@ class TimerPageState extends State<TimerPage> {
     Lap thisLap = new Lap();
     thisLap.lapNumber = dependencies.lapNumber;
     thisLap.laptimeMilliseconds = laptime;
-    thisLap.yellowFlags = dependencies.yellowFlags;
+    thisLap.yellowFlags = dependencies.yellowFlagObject;
     thisLap.safetyCar = dependencies.safetyCar;
 
     int milliseconds = dependencies.stopwatch.elapsedMilliseconds;
@@ -99,17 +100,15 @@ class TimerPageState extends State<TimerPage> {
   void toggleYellow(context)
   {
     setState(() {
-      if (dependencies.yellowFlags==true)
+      if (dependencies.yellowFlagObject.active==true)
       {
-        dependencies.yellowFlags = false;
-        dependencies.yellowFlagIcon = Icons.outlined_flag;
+        dependencies.yellowFlagObject.deactivate();
         dependencies.sessionStateColor = Colors.green;
         dependencies.sessionStateText =  "Running";
       }
       else
       {
-        dependencies.yellowFlags = true;
-        dependencies.yellowFlagIcon = Icons.flag;
+        dependencies.yellowFlagObject.activate();
         dependencies.sessionStateColor = Colors.yellow;
         dependencies.sessionStateText =  "Yellow Flag";
       }
@@ -119,18 +118,18 @@ class TimerPageState extends State<TimerPage> {
   void toggleSafetyCar(context)
   {
     setState(() {
-      if (dependencies.safetyCar==true)
+      if (dependencies.safetyCarObject.active==true)
       {
         dependencies.safetyCar = false;
-        dependencies.safetyCarColor = Colors.grey;
         dependencies.sessionStateColor = Colors.green;
         dependencies.sessionStateText =  "Running";
         dependencies.safetyCarIcon = Icons.directions_car;
+        dependencies.safetyCarObject.deactivate();
       }
       else
       {
+        dependencies.safetyCarObject.activate();
         dependencies.safetyCar = true;
-        dependencies.safetyCarColor = Colors.orangeAccent;
         dependencies.sessionStateColor = Colors.yellow;
         dependencies.sessionStateText =  "Safety Car";
         dependencies.safetyCarIcon = Icons.local_car_wash;
@@ -143,7 +142,7 @@ class TimerPageState extends State<TimerPage> {
     return <Widget> 
     [
       IconButton(
-          icon:  Icon(dependencies.yellowFlagIcon),
+          icon:  Icon(dependencies.yellowFlagObject.flagIcon),
           iconSize: 60,
           color: Colors.yellow,
           tooltip: 'Yellow Flag',
@@ -152,9 +151,9 @@ class TimerPageState extends State<TimerPage> {
           },
         ),
         IconButton(
-          icon:  Icon(dependencies.safetyCarIcon),
+          icon:  Icon(dependencies.safetyCarObject.icon),
           iconSize: 60,
-          color: dependencies.safetyCarColor,
+          color: dependencies.safetyCarObject.iconColor,
           tooltip: 'Safety Car',
           onPressed: () {
             toggleSafetyCar(context);
