@@ -48,6 +48,7 @@ class Dependencies {
   IconData yellowFlagIcon = Icons.outlined_flag;
   IconData safetyCarIcon = Icons.directions_car;
   int lapNumber = 1;
+  int pitwallEta = 0;
   Color sessionStateColor = Colors.green;
   Color safetyCarColor = Colors.grey;
   bool yellowFlags = false;
@@ -71,8 +72,9 @@ class TimerPageState extends State<TimerPage> {
 
       if (dependencies.stopwatch.isRunning) {
         print("${dependencies.stopwatch.elapsedMilliseconds}");
-        dependencies.lapNumber ++;
+        
         addLap(dependencies.stopwatch.elapsedMilliseconds);
+        dependencies.lapNumber ++;
         dependencies.stopwatch.reset();
       } else {
         dependencies.stopwatch.start();
@@ -89,6 +91,8 @@ class TimerPageState extends State<TimerPage> {
     thisLap.yellowFlags = dependencies.yellowFlags;
     thisLap.safetyCar = dependencies.safetyCar;
 
+    int milliseconds = dependencies.stopwatch.elapsedMilliseconds;
+    
     dependencies.stint.addLap(thisLap);
   }
 
@@ -159,12 +163,28 @@ class TimerPageState extends State<TimerPage> {
     ];
   }
 
+  formatLaptime(laptimeMilliseconds)
+  {
+    int laptimeThousands = (laptimeMilliseconds ).truncate();
+    int laptimeSeconds = (laptimeThousands / 1000).truncate();
+    int laptimeMinutes = (laptimeSeconds / 60).truncate();
+    int laptimeHours = (laptimeMinutes / 60).truncate();
+
+    String laptime = 
+    (laptimeMinutes % 60).toString().padLeft(2, '0') + ":" +
+    (laptimeSeconds % 100).toString().padLeft(2, '0') + "." +
+    (laptimeThousands % 100).toString().padLeft(3, '0');
+
+    return laptime;
+  }
+  
   getHistoricalLapRowWidget(Lap thisLap)
   {
     Row thisRow = new Row
     (
       children: <Widget>[
-          Text(thisLap.laptimeMilliseconds.toString(),style: TextStyle(fontSize: 60))
+          Text(thisLap.lapNumber.toString(),style: TextStyle(fontSize: 60)),
+          Text(formatLaptime(thisLap.laptimeMilliseconds),style: dependencies.textStyle)
       ],
     );
 
@@ -173,14 +193,35 @@ class TimerPageState extends State<TimerPage> {
 
   getLapHistory()
   {
-    var lapWidgets = <Widget> [];
+    var lapWidgets = <Widget>[];
 
-    for (Lap thisLap in dependencies.stint.getLast(3) )
+    var lapHistory = dependencies.stint.getLast(3);
+    if(lapHistory==null)
+      return lapWidgets;
+     for (int i = lapHistory.length-1; i >= 0; i--)
     {
-      lapWidgets.add(getHistoricalLapRowWidget(thisLap));
+      Lap thisLap = lapHistory.elementAt(i);
+        lapWidgets.add(getHistoricalLapRowWidget(thisLap));
     }
+
     return lapWidgets;
     
+  }
+
+  getFooter()
+  {
+    var footerWidgets = <Widget>[];
+    Row thisRow = new Row
+    (
+      children: <Widget>[
+          Text(" Pit ETA: ",style: TextStyle(fontSize: 60)),
+          Text(dependencies.pitwallEta.toString(),style: TextStyle(fontSize: 60))
+      ],
+    );
+
+    footerWidgets.add(thisRow);
+
+    return footerWidgets;
   }
 
   getCurrentLapNumber()
@@ -213,7 +254,6 @@ class TimerPageState extends State<TimerPage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             buildFloatingButton(dependencies.stopwatch.isRunning ? "lap" : "start", lapButtonPressed),
-            //buildFloatingButton(dependencies.stopwatch.isRunning ? "stop" : "start", rightButtonPressed),
           ],
         ),
       ),
@@ -260,8 +300,11 @@ class TimerPageState extends State<TimerPage> {
             new Row(
               children: getCurrentLapOptionsRow()
             ),
-            new Row(
+            new Column(
               children: getLapHistory()
+            ),
+            new Column(
+              children: getFooter()
             )
           ],
         ),

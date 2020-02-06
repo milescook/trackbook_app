@@ -13,12 +13,19 @@ class Stint {
       return laps[lapNumber];
     }
 
-    getLast(lapCount)
+    Iterable<Lap> getLast(lapCount)
     {
-      if (laps.length == 0) return <Lap>[];
+      Iterable<Lap> lastLaps = new List<Lap>();
+      if (laps.length == 0) return lastLaps;
       if(laps.length<lapCount)
-        return laps.getRange(0,laps.length);
+      {
+        lastLaps = laps.getRange(0,laps.length);
+      }
+      else
+      {
+        lastLaps= laps.getRange(laps.length - lapCount,laps.length);
+      }
 
-      return laps.getRange(laps.length - lapCount,lapCount);
+      return lastLaps;
     }
   }
