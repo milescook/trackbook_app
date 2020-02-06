@@ -100,40 +100,18 @@ class TimerPageState extends State<TimerPage> {
   void toggleYellow(context)
   {
     setState(() {
-      if (dependencies.yellowFlagObject.active==true)
-      {
-        dependencies.yellowFlagObject.deactivate();
-        dependencies.sessionStateColor = Colors.green;
-        dependencies.sessionStateText =  "Running";
-      }
-      else
-      {
-        dependencies.yellowFlagObject.activate();
-        dependencies.sessionStateColor = Colors.yellow;
-        dependencies.sessionStateText =  "Yellow Flag";
-      }
+      dependencies.yellowFlagObject.toggleState();
+      dependencies.sessionStateColor = dependencies.yellowFlagObject.sessionStateColor;
+      dependencies.sessionStateText =  dependencies.yellowFlagObject.sessionState;
     });
   }
 
   void toggleSafetyCar(context)
   {
     setState(() {
-      if (dependencies.safetyCarObject.active==true)
-      {
-        dependencies.safetyCar = false;
-        dependencies.sessionStateColor = Colors.green;
-        dependencies.sessionStateText =  "Running";
-        dependencies.safetyCarIcon = Icons.directions_car;
-        dependencies.safetyCarObject.deactivate();
-      }
-      else
-      {
-        dependencies.safetyCarObject.activate();
-        dependencies.safetyCar = true;
-        dependencies.sessionStateColor = Colors.yellow;
-        dependencies.sessionStateText =  "Safety Car";
-        dependencies.safetyCarIcon = Icons.local_car_wash;
-      }
+        dependencies.safetyCarObject.toggleState();
+        dependencies.sessionStateColor = dependencies.safetyCarObject.sessionStateColor;
+        dependencies.sessionStateText =  dependencies.safetyCarObject.sessionState;
     });
   }
 

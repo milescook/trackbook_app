@@ -4,8 +4,19 @@ class SafetyCar
 {
   IconData icon = Icons.directions_car;
   Color iconColor = Colors.grey;
+  Color sessionStateColor = Colors.green;
   bool active = false;
   String sessionState = "Running";
+
+  
+
+  toggleState()
+  {
+    if(active)
+      deactivate();
+    else
+      activate();
+  }
 
   activate()
   {
@@ -13,6 +24,7 @@ class SafetyCar
     active = true;
     sessionState = "Safety Car";
     iconColor = Colors.orangeAccent;
+    sessionStateColor = Colors.yellow;
   }
 
   deactivate()
@@ -21,5 +33,6 @@ class SafetyCar
     active = false;
     sessionState = "Running";
     iconColor = Colors.grey;
+    sessionStateColor = Colors.green;
   }
 }
